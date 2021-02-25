@@ -1,8 +1,8 @@
 {
   "name": "walk-async-fd",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Modern (A)synchronous walk implementation, using file descriptors/handlers, and TypeScript.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "files": ["lib/**/*"],
   "scripts": {
     "build": "tsc",
