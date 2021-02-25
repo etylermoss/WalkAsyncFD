@@ -1,8 +1,8 @@
 /* 3rd party imports */
-import { join } from 'path';
+import { join } from "path";
 
 /* 1st party imports */
-import { walkAsync, WalkOptions } from '../src/index';
+import { walkAsync, WalkOptions } from "../src/index";
 
 const walkOpts: WalkOptions = {
     write: false,
