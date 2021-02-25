@@ -6,7 +6,8 @@
   "files": ["lib/**/*"],
   "scripts": {
     "build": "tsc",
-    "example": "tsc ./example/index.ts && node ./example/index.js ."
+    "example": "tsc ./example/index.ts && node ./example/index.js .",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
