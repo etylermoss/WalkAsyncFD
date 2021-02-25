@@ -17,6 +17,8 @@
     "walk",
     "async",
     "fs",
+    "util",
+    "os",
     "typescript"
   ],
   "author": "Eden Tyler-Moss",
