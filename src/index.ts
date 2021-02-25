@@ -92,7 +92,7 @@ export const walkAsync = async (
 export const walk = (
     path: string,
     cb: WalkCallback,
-    options: WalkOptions,
+    options?: WalkOptions,
 ): void => {
     const dir = fs.opendirSync(path);
     let dirent: fs.Dirent | null;
