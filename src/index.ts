@@ -2,12 +2,10 @@
 import * as fs from "fs";
 import { join } from "path";
 
-export type WalkCallback = (fd: number, root: string, name: string) => any;
-export type WalkAsyncCallback = (fh: fs.promises.FileHandle, root: string, name: string) => Promise<any>;
+export type WalkCallback = (path: string, root: string, name: string) => any;
+export type WalkAsyncCallback = (path: string, root: string, name: string) => Promise<any>;
 
 export interface WalkOptions {
-    /** Opens the file descriptor/handler for writing as well as reading. (Default: false) */
-    write?: boolean;
     /** If any of the filters occur in the file/dir name, item is not walked. */
     filters?: RegExp[];
     /** Skip hidden files & directories. (Default: false) */
@@ -52,30 +50,28 @@ export const walkAsync = async (
         const isFiltered = options?.filters && filtered(dirent.name, options.filters);
         const isHidden = options?.skipHidden && dirent.name[0] == ".";
         const filePath = join(path, dirent.name);
-        const shouldWrite = options?.write ? "r+" : "r";
-        let fh: fs.promises.FileHandle | null = null;
 
         /* if the dirent name is filtered or hidden, skip it */
         if (isFiltered || isHidden)
             continue;
-        
+
+        /* catch exception, close dir handle, and re-throw */
         try
         {
+            /* run callback if file */
             if (dirent.isFile())
-                /* run callback if file */
-                await cb(fh =  await fs.promises.open(filePath, shouldWrite), path, dirent.name);
+                await cb(filePath, path, dirent.name);
+            /* recurse if directory */
             else if (dirent.isDirectory())
-                /* recurse if directory */
                 await walkAsync(filePath, cb, options);
-
-            /* if we created the file handler, close it */
-            if (fh)
-                await fh.close();
         }
         catch (err)
         {
             if (options?.errCb)
                 options.errCb(err);
+
+            await dir.close();
+            throw err;
         }
     }
 
@@ -102,8 +98,6 @@ export const walk = (
         const isFiltered = options?.filters && filtered(dirent.name, options.filters);
         const isHidden = options?.skipHidden && dirent.name[0] == ".";
         const filePath = join(path, dirent.name);
-        const shouldWrite = options?.write ? "r+" : "r";
-        let fd: number | null = null;
 
         if (isFiltered || isHidden)
             continue;
@@ -111,17 +105,17 @@ export const walk = (
         try
         {
             if (dirent.isFile())
-                cb(fd = fs.openSync(filePath, shouldWrite), path, dirent.name);
+                cb(filePath, path, dirent.name);
             else if (dirent.isDirectory())
                 walk(filePath, cb, options);
-
-            if (fd)
-                fs.closeSync(fd);
         }
         catch (err)
         {
             if (options?.errCb)
                 options.errCb(err);
+
+            dir.closeSync();
+            throw err;
         }
     }
 
