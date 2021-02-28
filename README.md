@@ -1,5 +1,5 @@
 # WalkAsyncFD
-Modern (A)synchronous walk implementation, using file descriptors/handlers, and TypeScript.
+Modern (A)synchronous walk implementation using TypeScript.
 
 [![npm version](https://badge.fury.io/js/walk-async-fd.svg)](https://badge.fury.io/js/walk-async-fd)
 
@@ -9,13 +9,13 @@ async/await.
 
 ## Installation:
 ```sh
-$> npm install --save walk-async-fd
+$> npm install walk-async-fd
 ```
 
 ## Example:
 
 ```sh
-$> npm run example # node example/index.js .
+$> npm run example # runs `node example/index.js .`
 
 # Prints size of all files in this directory
 File: README.md is 106 bytes.
@@ -30,19 +30,18 @@ File: example/index.ts is 621 bytes.
 ```
 
 ## Async/Sync:
-Comes with both an Aynchronous and Synchronous version, syntax is virtually identical, with the main difference being the (integer) file descriptor passed to the callback with `walk`, compared to the FileHandler with `walkAsync`.
+Comes with both an Aynchronous and Synchronous version, syntax is virtually identical.
 ```ts
 import { walkAsync, walk } from "walk-async-fd";
 
-walkAsync(process.argv[2], async (fh, root, name) => {
-    const stats = await fh.stat();
-    const size = stats.size;
+walkAsync(process.argv[2], async (path) => {
+    const file = await fs.promises.open(path, 'r'); // make sure to catch, see example/index.ts
+    const size = (await file.stat()).size;
     ...
 });
 
-walk(process.argv[2], (fd, root, name) => {
-    const stats = fstatSync(fd); // with sync, need to call fstat
-    const size = stats.size;
+walk(process.argv[2], (path) => {
+    const size = fs.statSync(path).size;
     ...
 });
 ```
